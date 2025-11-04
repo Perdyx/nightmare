@@ -1,0 +1,16 @@
+[
+    {
+        "type": "openapi",
+        "url": "http://localhost:6902",
+        "spec_type": "url",
+        "spec": "",
+        "path": "openapi.json",
+        "auth_type": "bearer",
+        "key": "",
+        "info": {
+            "id": "hexstrike-ai",
+            "name": "HexStrike",
+            "description": "Advanced Cybersecurity Automation Platform"
+        }
+    }
+]
