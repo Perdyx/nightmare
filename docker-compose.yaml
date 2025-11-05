@@ -9,7 +9,6 @@ services:
     cap_add:
       - NET_ADMIN
       - NET_RAW
-    network_mode: service:vpn
     ports:
       - "6901:22"
       - "6902:8000"
