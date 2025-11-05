@@ -37,10 +37,14 @@ $ docker compose up -d
 3. Click External Tools on the left
 4. Import assets/mcp.json and set Auth to owui_data/your MCP_API_KEY variable to in .env.
 
+*Note: You will need to manually enable the HexStrike tool in each new chat using the diamond-shaped "Integrations" button below the message bar.*
+
 ### 4. Configuring the system prompt
 
 1. Go to Workspace in the left sidebar and then to the Prompts tab
 2. Add a new prompt using the content of assets/sysprompt.txt
+
+Once added, this prompt can be initalized in each chat by typing a forward slash and selecting it from the list.
 
 ### 5. Stopping the Environment
 ```bash
