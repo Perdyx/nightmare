@@ -1,37 +1,11 @@
 name: nightmare
 
 services:
-  # vpn:
-  #   image: qmcgaw/gluetun
-  #   devices:
-  #     - /dev/net/tun:/dev/net/tun
-  #   ports:
-  #     - "6901:22"
-  #     - "6902:8000"
-  #   cap_add:
-  #     - NET_ADMIN
-  #   environment:
-  #     - TZ=UTC
-  #     - VPN_SERVICE_PROVIDER=protonvpn
-  #     - VPN_TYPE=wireguard
-  #     - WIREGUARD_PRIVATE_KEY=$WIREGUARD_PRIVATE_KEY
-  #     - SERVER_COUNTRIES=$SERVER_COUNTRIES
-  #     - FREE_ONLY=true
-  #     - EXTRA_SUBNETS=172.16.1.0/24
-  #   healthcheck:
-  #     test: ping -c 1 1.1.1.1 || exit 1
-  #     interval: 20s
-  #     timeout: 10s
-  #     retries: 5
-  #   restart: unless-stopped
-
   kali-hexstrike:
     image: kali-hexstrike:latest
     build:
       context: ./kali
       dockerfile: Dockerfile
-    # depends_on:
-    #   - vpn
     cap_add:
       - NET_ADMIN
       - NET_RAW
