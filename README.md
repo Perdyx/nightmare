@@ -31,18 +31,21 @@ $ docker compose up -d
 - Log in or create a new local account
 
 ### 3. Configuring the tool server
-
 1. Click your account icon in the top right of the Open Web UI interface
 2. Go to AdminPanel and then to the Settings tab
 3. Click External Tools on the left
-4. Import assets/mcp.json and set Auth to owui_data/your MCP_API_KEY variable to in .env.
+4. Click + on the right to add a new tool server
+5. Click Import and choose assets/mcp.json
+6. Set Auth type to "Bearer" and fill in your API key (this should match the MCP_API_KEY variable that you set in .env)
+
+*Note: Sometimes the import feature does not work properly. If this happens, manually copy the corresponding values from assets/mcp.json into the form.*
 
 *Note: You will need to manually enable the HexStrike tool in each new chat using the diamond-shaped "Integrations" button below the message bar.*
 
 ### 4. Configuring the system prompt
 
 1. Go to Workspace in the left sidebar and then to the Prompts tab
-2. Add a new prompt using the content of assets/sysprompt.txt
+2. Add a new prompt from assets/sysprompt.txt
 
 Once added, this prompt can be initalized in each chat by typing a forward slash and selecting it from the list.
 
