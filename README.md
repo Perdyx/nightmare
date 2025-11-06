@@ -27,8 +27,8 @@ $ docker compose up -d
 ```
 
 ### 2. Accessing Open Web UI
-- Navigate to `http://localhost:6903` in your browser
-- Log in or create a new local account
+1. Navigate to `http://localhost:6903` in your browser
+2. Log in or create a new local account
 
 ### 3. Configuring the tool server
 1. Click your account icon in the top right of the Open Web UI interface
