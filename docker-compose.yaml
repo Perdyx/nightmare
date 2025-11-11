@@ -24,7 +24,6 @@ services:
     image: ghcr.io/open-webui/open-webui:main
     depends_on:
       - kali-hexstrike
-    network_mode: host
     ports:
       - "6903:6903"
     environment:
