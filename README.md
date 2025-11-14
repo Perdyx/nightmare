@@ -1,5 +1,7 @@
 # Nightmare
 
+**THIS README IS A WORK IN PROGRESS AND WILL BE UPDATED LATER**
+
 ## Overview
 Nightmare is an AI stack utilizing [Ollama models](https://ollama.com/search) running on the host to orchestrate security testing using a Kali Linux container pre-loaded with [HexStrike-AI](https://github.com/0x4m4/hexstrike-ai/tree/master).
 

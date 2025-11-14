@@ -20,19 +20,74 @@ services:
     tty: true
     restart: no
 
-  open-webui:
-    image: ghcr.io/open-webui/open-webui:main
-    depends_on:
-      - kali-hexstrike
+  nightmare-server:
+    image: nightmare-server:latest
+    build:
+      context: ./server
+      dockerfile: Dockerfile
     ports:
-      - "6903:6903"
-    environment:
-      - PORT=6903
-      - MODEL_DOWNLOAD_DIR=/models
-      - OLLAMA_API_BASE_URL=http://host.docker.internal:11434
-      - LOG_LEVEL=debug
+      - "11435:11434"
     volumes:
-      - ./owui_data:/app/backend/data:z
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - nightmare_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     restart: unless-stopped
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - GENERIC_TIMEZONE=${TIMEZONE}
+      - TZ=${TIMEZONE}
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
+      - NODE_ENV=production
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+
+  # open-webui:
+  #   image: ghcr.io/open-webui/open-webui:main
+  #   depends_on:
+  #     - kali-hexstrike
+  #   ports:
+  #     - "6903:6903"
+  #   environment:
+  #     - PORT=6903
+  #     - MODEL_DOWNLOAD_DIR=/models
+  #     - OLLAMA_API_BASE_URL=http://host.docker.internal:11434
+  #     - LOG_LEVEL=debug
+  #   volumes:
+  #     - owui_data:/app/backend/data
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   restart: unless-stopped
+
+  # ollama-telegram:
+  #   image: ruecat/ollama-telegram
+  #   depends_on:
+  #     - kali-hexstrike
+  #   environment:
+  #     - TOKEN=$TELEGRAM_BOT_TOKEN
+  #     - ADMIN_IDS=$TELEGRAM_USER_ID
+  #     - USER_IDS=$TELEGRAM_USER_ID
+  #     - INITMODEL=$OLLAMA_MODEL
+  #     - OLLAMA_BASE_URL=host.docker.internal
+  #     - OLLAMA_PORT=11434
+  #     - TIMEOUT=43200
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   restart: on-failure
+
+volumes:
+  nightmare_data:
+  n8n_data:
+  # owui_data:
