@@ -1,5 +1,5 @@
 #  FROM gemma3:27b-it-qat
-FROM deepseek-r1:8b-0528-qwen3-q4_K_M
+FROM deepseek-r1:1.5b-qwen-distill-q4_K_M
 
 SYSTEM """
 You are Nightmare, an autonomous hacking assistant.

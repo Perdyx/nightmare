@@ -1,8 +1,9 @@
 name: nightmare
 
 services:
-  kali-hexstrike:
-    image: kali-hexstrike:latest
+  hexstrike:
+    image: hexstrike:latest
+    container_name: hexstrike
     build:
       context: ./kali
       dockerfile: Dockerfile
@@ -12,63 +13,81 @@ services:
     ports:
       - "6901:22"
       - "6902:8000"
-    environment:
-      - ROOT_PASSWORD=$ROOT_PASSWORD
+    networks:
+      - nightmare_network
     volumes:
       - ./vault:/root/vault:z
+    environment:
+      - ROOT_PASSWORD=$ROOT_PASSWORD
     stdin_open: true
     tty: true
     restart: no
 
-  nightmare-server:
-    image: nightmare-server:latest
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+  nightmare:
+    image: ollama/ollama:latest
+    container_name: nightmare
     ports:
       - "11435:11434"
+    networks:
+      - nightmare_network
     volumes:
       - nightmare_data:/root/.ollama
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+      - ./Modelfile:/Modelfile:ro
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
     restart: unless-stopped
+    entrypoint: ["/bin/bash", "-c", "\
+      ollama serve & \
+      sleep 5 && \
+      ollama create nightmare -f /Modelfile && \
+      wait"]
 
   n8n:
     image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    depends_on:
+      - hexstrike
+      - nightmare
     ports:
       - "5678:5678"
+    networks:
+      - nightmare_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - n8n_data:/home/node/.n8n
     environment:
       - GENERIC_TIMEZONE=${TIMEZONE}
       - TZ=${TIMEZONE}
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_RUNNERS_ENABLED=true
       - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
+      - N8N_SECURE_COOKIE=false
       - NODE_ENV=production
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - n8n_data:/home/node/.n8n
     restart: unless-stopped
 
   # open-webui:
   #   image: ghcr.io/open-webui/open-webui:main
+  #   container_name: open-webui
   #   depends_on:
-  #     - kali-hexstrike
+  #     - n8n
   #   ports:
   #     - "6903:6903"
+  #   networks:
+  #     - nightmare_network
+  #   volumes:
+  #     - owui_data:/app/backend/data
   #   environment:
   #     - PORT=6903
   #     - MODEL_DOWNLOAD_DIR=/models
-  #     - OLLAMA_API_BASE_URL=http://host.docker.internal:11434
+  #     - OLLAMA_API_BASE_URL=http://nightmare:11435
   #     - LOG_LEVEL=debug
-  #   volumes:
-  #     - owui_data:/app/backend/data
-  #   extra_hosts:
-  #     - "host.docker.internal:host-gateway"
+  #   # extra_hosts:
+  #   #   - "host.docker.internal:host-gateway"
   #   restart: unless-stopped
 
   # ollama-telegram:
@@ -91,3 +110,7 @@ volumes:
   nightmare_data:
   n8n_data:
   # owui_data:
+
+networks:
+  nightmare_network:
+    driver: bridge
