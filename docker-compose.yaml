@@ -44,7 +44,7 @@ services:
     entrypoint: ["/bin/bash", "-c", "\
       ollama serve & \
       sleep 5 && \
-      ollama create nightmare -f /Modelfile && \
+      ollama pull ${MODEL} && \
       wait"]
 
   n8n:
