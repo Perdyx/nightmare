@@ -1,6 +1,27 @@
 name: nightmare
 
+networks:
+  nightmare_network:
+    driver: bridge
+
+volumes:
+  ollama_data:
+  owui_data:
+  n8n_data:
+
 services:
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok 
+    ports:
+      - "4040:4040"
+    networks:
+      - nightmare_network
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_TOKEN}
+    command: http --url=${NGROK_SUBDOMAIN}.${NGROK_DOMAIN} n8n:5678
+    restart: unless-stopped
+
   hexstrike:
     image: hexstrike:latest
     container_name: hexstrike
@@ -11,28 +32,31 @@ services:
       - NET_ADMIN
       - NET_RAW
     ports:
-      - "6901:22"
-      - "6902:8000"
+      - "6922:22"
+      - "8000:8000"
     networks:
       - nightmare_network
     volumes:
       - ./vault:/root/vault:z
     environment:
-      - ROOT_PASSWORD=$ROOT_PASSWORD
+      - ROOT_PASSWORD=${ROOT_PASSWORD}
     stdin_open: true
     tty: true
     restart: no
 
-  nightmare:
+  ollama:
     image: ollama/ollama:latest
-    container_name: nightmare
+    container_name: ollama
+    depends_on:
+      - hexstrike
     ports:
       - "11435:11434"
     networks:
       - nightmare_network
     volumes:
-      - nightmare_data:/root/.ollama
+      - ollama_data:/root/.ollama
       - ./Modelfile:/Modelfile:ro
+    # Uncomment the following deploy block if you have an NVIDIA card and want to enable GPU support
     # deploy:
     #   resources:
     #     reservations:
@@ -47,70 +71,43 @@ services:
       ollama pull ${MODEL} && \
       wait"]
 
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    depends_on:
+      - ollama
+    ports:
+      - "3000:8080"
+    networks:
+      - nightmare_network
+    volumes:
+      - owui_data:/app/backend/data
+    environment:
+      - MODEL_DOWNLOAD_DIR=/models
+      - OLLAMA_API_BASE_URL=http://ollama:11435
+    restart: unless-stopped
+
   n8n:
     image: docker.n8n.io/n8nio/n8n
     container_name: n8n
     depends_on:
-      - hexstrike
-      - nightmare
+      - ollama
+      - ngrok
     ports:
-      - "5678:5678"
+      - "127.0.0.1:5678:5678"
     networks:
       - nightmare_network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - n8n_data:/home/node/.n8n
     environment:
+      - NODE_ENV=production
       - GENERIC_TIMEZONE=${TIMEZONE}
       - TZ=${TIMEZONE}
+      - N8N_SECURE_COOKIE=false
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_RUNNERS_ENABLED=true
       - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
-      - N8N_SECURE_COOKIE=false
-      - NODE_ENV=production
+      - WEBHOOK_URL=https://${NGROK_SUBDOMAIN}.${NGROK_DOMAIN}
+      - N8N_EDITOR_BASE_URL=http://localhost:5678
     restart: unless-stopped
-
-  # open-webui:
-  #   image: ghcr.io/open-webui/open-webui:main
-  #   container_name: open-webui
-  #   depends_on:
-  #     - n8n
-  #   ports:
-  #     - "6903:6903"
-  #   networks:
-  #     - nightmare_network
-  #   volumes:
-  #     - owui_data:/app/backend/data
-  #   environment:
-  #     - PORT=6903
-  #     - MODEL_DOWNLOAD_DIR=/models
-  #     - OLLAMA_API_BASE_URL=http://nightmare:11435
-  #     - LOG_LEVEL=debug
-  #   # extra_hosts:
-  #   #   - "host.docker.internal:host-gateway"
-  #   restart: unless-stopped
-
-  # ollama-telegram:
-  #   image: ruecat/ollama-telegram
-  #   depends_on:
-  #     - kali-hexstrike
-  #   environment:
-  #     - TOKEN=$TELEGRAM_BOT_TOKEN
-  #     - ADMIN_IDS=$TELEGRAM_USER_ID
-  #     - USER_IDS=$TELEGRAM_USER_ID
-  #     - INITMODEL=$OLLAMA_MODEL
-  #     - OLLAMA_BASE_URL=host.docker.internal
-  #     - OLLAMA_PORT=11434
-  #     - TIMEOUT=43200
-  #   extra_hosts:
-  #     - "host.docker.internal:host-gateway"
-  #   restart: on-failure
-
-volumes:
-  nightmare_data:
-  n8n_data:
-  # owui_data:
-
-networks:
-  nightmare_network:
-    driver: bridge
