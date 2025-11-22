@@ -5,23 +5,9 @@ networks:
     driver: bridge
 
 volumes:
-  ollama_data:
-  owui_data:
   n8n_data:
 
 services:
-  ngrok:
-    image: ngrok/ngrok:latest
-    container_name: ngrok 
-    ports:
-      - "4040:4040"
-    networks:
-      - nightmare_network
-    environment:
-      - NGROK_AUTHTOKEN=${NGROK_TOKEN}
-    command: http --url=${NGROK_SUBDOMAIN}.${NGROK_DOMAIN} n8n:5678
-    restart: unless-stopped
-
   hexstrike:
     image: hexstrike:latest
     container_name: hexstrike
@@ -34,6 +20,7 @@ services:
     ports:
       - "6922:22"
       - "8000:8000"
+      - "8888:8888"
     networks:
       - nightmare_network
     volumes:
@@ -44,54 +31,23 @@ services:
     tty: true
     restart: no
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    depends_on:
-      - hexstrike
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok 
     ports:
-      - "11435:11434"
+      - "4040:4040"
     networks:
       - nightmare_network
-    volumes:
-      - ollama_data:/root/.ollama
-      - ./Modelfile:/Modelfile:ro
-    # Uncomment the following deploy block if you have an NVIDIA card and want to enable GPU support
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities: [gpu]
-    restart: unless-stopped
-    entrypoint: ["/bin/bash", "-c", "\
-      ollama serve & \
-      sleep 5 && \
-      ollama pull ${MODEL} && \
-      wait"]
-
-  open-webui:
-    image: ghcr.io/open-webui/open-webui:main
-    container_name: open-webui
-    depends_on:
-      - ollama
-    ports:
-      - "3000:8080"
-    networks:
-      - nightmare_network
-    volumes:
-      - owui_data:/app/backend/data
     environment:
-      - MODEL_DOWNLOAD_DIR=/models
-      - OLLAMA_API_BASE_URL=http://ollama:11435
+      - NGROK_AUTHTOKEN=${NGROK_TOKEN}
+    command: http --url=${NGROK_SUBDOMAIN}.${NGROK_DOMAIN} n8n:5678
     restart: unless-stopped
 
   n8n:
     image: docker.n8n.io/n8nio/n8n
     container_name: n8n
     depends_on:
-      - ollama
+      - hexstrike
       - ngrok
     ports:
       - "127.0.0.1:5678:5678"
