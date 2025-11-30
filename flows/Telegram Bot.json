@@ -3,109 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "version": 2,
-            "leftValue": "",
-            "caseSensitive": true,
-            "typeValidation": "strict"
-          },
-          "combinator": "and",
-          "conditions": [
-            {
-              "id": "a0bf9719-4272-46f6-ab3b-eda6f7b44fd8",
-              "operator": {
-                "type": "string",
-                "operation": "empty",
-                "singleValue": true
-              },
-              "leftValue": "={{ $json.message.text }}",
-              "rightValue": ""
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "107034bd-1ac2-40fb-8fa5-b4e0b54c9b19",
-      "name": "If",
-      "type": "n8n-nodes-base.if",
-      "position": [
-        384,
-        1376
-      ],
-      "typeVersion": 2.2
-    },
-    {
-      "parameters": {
-        "fields": {
-          "values": [
-            {
-              "name": "text",
-              "stringValue": "={{ $json?.message?.text || \"\" }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "3186e84e-e8bb-4d3c-851a-98153cd6c06c",
-      "name": "Voice or Text",
-      "type": "n8n-nodes-base.set",
-      "position": [
-        160,
-        1376
-      ],
-      "typeVersion": 3.2
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Catch incoming messages').item.json.message.chat.id }}",
-        "text": "Sorry, voice input is not supported.",
-        "additionalFields": {
-          "appendAttribution": false
-        }
-      },
-      "id": "d232b651-7655-47f6-9c73-8a2dd08f98c8",
-      "name": "Reply - Voice not supported",
-      "type": "n8n-nodes-base.telegram",
-      "position": [
-        736,
-        1040
-      ],
-      "webhookId": "76e4b8a4-1086-4d24-b60e-b96942d83bdf",
-      "typeVersion": 1.2,
-      "credentials": {
-        "telegramApi": {
-          "id": "7BJCOrEmLPpUdNhg",
-          "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "updates": [
-          "message"
-        ],
-        "additionalFields": {}
-      },
-      "id": "669c4782-230c-4def-ba53-c4d15cf3c1d2",
-      "name": "Catch incoming messages",
-      "type": "n8n-nodes-base.telegramTrigger",
-      "position": [
-        -64,
-        1376
-      ],
-      "webhookId": "322dce18-f93e-4f86-b9b1-3305519b7834",
-      "typeVersion": 1,
-      "credentials": {
-        "telegramApi": {
-          "id": "7BJCOrEmLPpUdNhg",
-          "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Catch incoming messages').item.json.message.chat.id }}",
+        "chatId": "={{ $('Catch Incoming Messages').item.json.message.chat.id }}",
         "text": "={{ $json.output }}",
         "additionalFields": {
           "appendAttribution": false
@@ -115,7 +13,7 @@
       "name": "Reply to Telegram",
       "type": "n8n-nodes-base.telegram",
       "position": [
-        1456,
+        1664,
         1488
       ],
       "webhookId": "e699405e-8e52-4d38-a06b-1fa8edf050bd",
@@ -131,7 +29,7 @@
     {
       "parameters": {
         "dataType": "string",
-        "value1": "={{ $('If').item.json.message.text }}",
+        "value1": "={{ $('Catch Incoming Messages').item.json.message.text }}",
         "rules": {
           "rules": [
             {
@@ -152,14 +50,14 @@
       "name": "Command Handler",
       "type": "n8n-nodes-base.switch",
       "position": [
-        736,
+        496,
         1472
       ],
       "typeVersion": 1
     },
     {
       "parameters": {
-        "chatId": "={{ $('Catch incoming messages').item.json.message.chat.id }}",
+        "chatId": "={{ $('Catch Incoming Messages').item.json.message.chat.id }}",
         "text": "Please enter a recognized command or simply type a message.",
         "additionalFields": {
           "appendAttribution": false
@@ -169,8 +67,8 @@
       "name": "Reply - Unrecognized command",
       "type": "n8n-nodes-base.telegram",
       "position": [
-        1008,
-        1312
+        800,
+        1344
       ],
       "webhookId": "76e4b8a4-1086-4d24-b60e-b96942d83bdf",
       "typeVersion": 1.2,
@@ -183,16 +81,105 @@
     },
     {
       "parameters": {
-        "operation": "sendChatAction",
-        "chatId": "={{ $json.message.from.id }}",
-        "action": "=typing"
+        "chatId": "={{ $('Catch Incoming Messages').item.json.message.chat.id }}",
+        "text": "Hello! I am Nightmare.\n\nAvailable commands:\n/target - Begin an automated reconnaissance campaign against a target",
+        "additionalFields": {
+          "appendAttribution": false
+        }
       },
-      "id": "51dc41ae-eada-4da8-8a9a-8abaf9b097a7",
-      "name": "Send typing action",
+      "id": "4f66501e-1038-42c7-864d-fc0c5a2e5f1c",
+      "name": "Reply - /start",
       "type": "n8n-nodes-base.telegram",
       "position": [
-        1008,
-        1136
+        800,
+        1616
+      ],
+      "webhookId": "76e4b8a4-1086-4d24-b60e-b96942d83bdf",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "7BJCOrEmLPpUdNhg",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Catch Incoming Messages').first().json.message.from.id }}"
+      },
+      "id": "9b4ad878-166b-436e-8669-83f52fff36ba",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1376,
+        1712
+      ],
+      "typeVersion": 1.2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Catch Incoming Messages').item.json.message.caption ? ($('Catch Incoming Messages').item.json.message.caption + \"\\n\\n\" + $json.data) : $('Catch Incoming Messages').item.json.message.text }}",
+        "options": {}
+      },
+      "id": "b0c0d465-80df-4dae-bf7a-b612f4002ea7",
+      "name": "Nightmare Assistant",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1312,
+        1488
+      ],
+      "typeVersion": 1.6
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:3b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        2032
+      ],
+      "id": "52217b79-b2fe-4060-9526-4c830fe4b6e6",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "RDa9oViwokxhZFLz",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Check if HexStrike is online and accessible",
+        "url": "http://hexstrike:8888/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        1712,
+        2016
+      ],
+      "id": "07df51cf-1f87-4acd-bbf1-5d175b6abdb5",
+      "name": "HexStrike - Healthcheck"
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $('Catch Incoming Messages').item.json.message.chat.id }}",
+        "action": "=typing"
+      },
+      "id": "9bc922b9-a516-436b-9d8a-617e1afaf145",
+      "name": "Send Typing Action",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        -48,
+        1264
       ],
       "typeVersion": 1,
       "webhookId": "c83b2867-0fe3-4a30-ab40-904bb2efd92c",
@@ -205,18 +192,109 @@
     },
     {
       "parameters": {
-        "chatId": "={{ $('Catch incoming messages').item.json.message.chat.id }}",
-        "text": "Hello! I am Nightmare.\n\nAvailable commands:\n/target - Begin an automated reconnaissance campaign against a target",
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "669c4782-230c-4def-ba53-c4d15cf3c1d2",
+      "name": "Catch Incoming Messages",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "position": [
+        -320,
+        1264
+      ],
+      "webhookId": "322dce18-f93e-4f86-b9b1-3305519b7834",
+      "typeVersion": 1,
+      "credentials": {
+        "telegramApi": {
+          "id": "7BJCOrEmLPpUdNhg",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b27da4db-cd47-4b16-8826-296e12034325",
+              "leftValue": "={{ $('Catch Incoming Messages').item.json.message.document }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        1264
+      ],
+      "id": "8cf0fc48-c735-4bcd-b930-1a77825092b7",
+      "name": "If Message Contains File"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b27da4db-cd47-4b16-8826-296e12034325",
+              "leftValue": "={{ $('Catch Incoming Messages').item.json.message.caption }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        1024
+      ],
+      "id": "5dc719b8-ce11-4a1c-ba89-b42c6102d1c4",
+      "name": "If Message Blank"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Catch Incoming Messages').item.json.message.chat.id }}",
+        "text": "Please include a prompt.",
         "additionalFields": {
           "appendAttribution": false
         }
       },
-      "id": "4f66501e-1038-42c7-864d-fc0c5a2e5f1c",
-      "name": "Reply - /start",
+      "id": "780af1b9-fe62-4f0c-9767-acd0ac84764b",
+      "name": "Reply - Unsupported Message",
       "type": "n8n-nodes-base.telegram",
       "position": [
-        1168,
-        1680
+        800,
+        912
       ],
       "webhookId": "76e4b8a4-1086-4d24-b60e-b96942d83bdf",
       "typeVersion": 1.2,
@@ -229,87 +307,58 @@
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "dvJv0YVTZ2Lc7hhO",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/dvJv0YVTZ2Lc7hhO",
-          "cachedResultName": "Recon"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {}
-        },
+        "toolDescription": "AI Agent that can check the status of a HexStrike server",
+        "text": "Make a request to HexStrike to check its status.",
         "options": {}
       },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
       "position": [
-        1168,
-        1488
+        1520,
+        1792
       ],
-      "id": "baaa3d9c-e405-473f-8247-fb207a837573",
-      "name": "Call 'Recon'"
+      "id": "5b290f96-3db2-48c1-a07a-d1fa35e7fc2a",
+      "name": "AI Agent - HexStrike - Healthcheck"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Catch Incoming Messages').item.json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        1136
+      ],
+      "id": "faa3dbee-1b32-4011-8c83-6fee3d0b3e40",
+      "name": "Get Attached File",
+      "webhookId": "0416602f-9dc2-45b1-8a6a-92acbbde5543",
+      "credentials": {
+        "telegramApi": {
+          "id": "7BJCOrEmLPpUdNhg",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        1136
+      ],
+      "id": "3af11637-7aaa-441e-bd99-d202d1233348",
+      "name": "Extract from File"
     }
   ],
   "pinData": {},
   "connections": {
-    "If": {
-      "main": [
-        [
-          {
-            "node": "Reply - Voice not supported",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Send typing action",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Command Handler",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Voice or Text": {
-      "main": [
-        [
-          {
-            "node": "If",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Catch incoming messages": {
-      "main": [
-        [
-          {
-            "node": "Voice or Text",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send typing action": {
-      "main": [
-        [
-          {
-            "node": "Reply to Telegram",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Command Handler": {
       "main": [
         [
@@ -321,7 +370,7 @@
         ],
         [
           {
-            "node": "Call 'Recon'",
+            "node": "Nightmare Assistant",
             "type": "main",
             "index": 0
           }
@@ -336,7 +385,45 @@
         []
       ]
     },
-    "Call 'Recon'": {
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Nightmare Assistant",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Nightmare Assistant",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent - HexStrike - Healthcheck",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HexStrike - Healthcheck": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent - HexStrike - Healthcheck",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nightmare Assistant": {
       "main": [
         [
           {
@@ -346,11 +433,102 @@
           }
         ]
       ]
+    },
+    "Send Typing Action": {
+      "main": [
+        [
+          {
+            "node": "If Message Contains File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Catch Incoming Messages": {
+      "main": [
+        [
+          {
+            "node": "Send Typing Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Message Contains File": {
+      "main": [
+        [
+          {
+            "node": "If Message Blank",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Command Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Message Blank": {
+      "main": [
+        [
+          {
+            "node": "Reply - Unsupported Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Attached File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - HexStrike - Healthcheck": {
+      "ai_tool": [
+        [
+          {
+            "node": "Nightmare Assistant",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Attached File": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Nightmare Assistant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {},
-  "versionId": "0fabc4e7-8b94-4d2d-9bc2-256db15ac9d4",
+  "versionId": "481dfc82-5876-489b-8743-3c3ba5ef925a",
   "meta": {
     "templateId": "1934",
     "templateCredsSetupCompleted": true,
