@@ -219,7 +219,10 @@ RUN git clone https://github.com/0x4m4/hexstrike-ai.git /opt/hexstrike-ai && \
 
 # Add VS Code integration for HexStrike
 RUN mkdir /.vscode
-COPY mcp.json /.vscode/mcp.json
+COPY ./vscode/mcp.json /.vscode/mcp.json
+COPY ./vscode/settings.json /.vscode/settings.json
+RUN mkdir -p /.github/agents
+COPY ./vscode/Hexstrike.agent.md /.github/agents/Hexstrike.agent.md
 
 
 ########## Image Optimizations and Cleanup ##########

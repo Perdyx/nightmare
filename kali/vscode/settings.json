@@ -1,0 +1,3 @@
+{
+    "github.copilot.chat.byok.ollamaEndpoint": "http://host.docker.internal:11434"
+}
