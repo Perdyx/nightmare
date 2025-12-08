@@ -18,16 +18,15 @@ services:
       - NET_ADMIN
       - NET_RAW
     ports:
-      - "6922:22"
+      - "$SSH_PORT:22"
       - "8000:8000"
       - "8888:8888"
     networks:
       - nightmare_network
     volumes:
-      - ./vault:/root/vault:z
+      - $WORKSPACE:/root/workspace:z
     environment:
-      - ROOT_PASSWORD=${ROOT_PASSWORD}
-    stdin_open: true
+      - ROOT_PASSWORD=$ROOT_PASSWORD
     tty: true
     restart: no
 
