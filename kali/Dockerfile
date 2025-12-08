@@ -144,7 +144,7 @@ RUN apt-get install -y --fix-missing --no-install-recommends \
     kali-linux-headless
 
 # Install pipx
-RUN apt install pipx
+RUN apt install -y pipx
 RUN pipx ensurepath --global
 
 # Add pipx packages to path
@@ -159,6 +159,7 @@ RUN pipx install \
     volatility3
 
 # Install Ruby gems
+RUN apt install -y ruby-dev
 RUN gem install --no-document wpscan evil-winrm
 
 # Install specialized tools
