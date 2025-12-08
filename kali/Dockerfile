@@ -146,6 +146,9 @@ RUN apt-get install -y --fix-missing --no-install-recommends \
 # Install pipx
 RUN apt install pipx
 RUN pipx ensurepath --global
+
+# Add pipx packages to path
+ENV PATH="/root/.local/bin:${PATH}"
  
 # Install Python packages
 RUN pipx install \
@@ -203,14 +206,19 @@ RUN go install -v github.com/PentestPad/subzy@latest
 RUN go install -v github.com/sensepost/gowitness@latest
 
 
-########## Hexstrike and MCPO ##########
+########## HexStrike and MCPO ##########
 
-ENV PATH="/root/.local/bin:${PATH}"
+# Install https://github.com/open-webui/mcpo
 RUN pipx install mcpo
 
+# Install HexStrike AI
 RUN git clone https://github.com/0x4m4/hexstrike-ai.git /opt/hexstrike-ai && \
     python3 -m venv /opt/hexstrike-ai/hexstrike-env && \
     /opt/hexstrike-ai/hexstrike-env/bin/pip install --no-cache-dir -r /opt/hexstrike-ai/requirements.txt
+
+# Add VS Code integration for HexStrike
+RUN mkdir /.vscode
+COPY mcp.json /.vscode/mcp.json
 
 
 ########## Image Optimizations and Cleanup ##########
