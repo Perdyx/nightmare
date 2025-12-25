@@ -162,7 +162,7 @@ RUN pipx install \
 RUN apt install -y ruby-dev
 RUN gem install --no-document wpscan evil-winrm
 
-# Install specialized tools
+# Install feroxbuster
 RUN apt-get update && apt-get install -y feroxbuster || \
     (mkdir -p /opt/feroxbuster && \
      curl -L -o /opt/feroxbuster/feroxbuster.zip "https://github.com/epi052/feroxbuster/releases/latest/download/feroxbuster-linux-x86_64.zip" && \
@@ -174,6 +174,12 @@ RUN git clone https://github.com/maurosoria/dirsearch.git /opt/dirsearch && \
     python3 -m venv /opt/dirsearch/venv && \
     /opt/dirsearch/venv/bin/pip install --no-cache-dir -r /opt/dirsearch/requirements.txt && \
     ln -s /opt/dirsearch/dirsearch.py /usr/local/bin/dirsearch
+
+# Install AutoSpear
+RUN git clone https://github.com/u21h2/AutoSpear.git /opt/AutoSpear && \
+    python3 -m virtualenv /opt/AutoSpear/spearenv && \
+    /opt/AutoSpear/spearenv/bin/pip install --no-cache-dir -r /opt/AutoSpear/requirements.txt && \
+    ln -s /opt/AutoSpear/autospear.py /usr/local/bin/autospear
 
 
 ########## Golang ##########
