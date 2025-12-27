@@ -13,4 +13,4 @@ source /opt/hexstrike-ai/hexstrike-env/bin/activate
 python3 /opt/hexstrike-ai/hexstrike_server.py --port 8888 &
 
 # Start MCPO
-# mcpo --port 8000 --api-key "${MCP_API_KEY}" -- python3 /opt/hexstrike-ai/hexstrike_mcp.py --server http://localhost:8888
+mcpo --port 8000 --api-key "${MCP_API_KEY}" -- python3 /opt/hexstrike-ai/hexstrike_mcp.py --server http://localhost:8888
