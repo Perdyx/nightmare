@@ -34,28 +34,28 @@ RUN apt upgrade -y
 RUN apt-get install -y --no-install-recommends tmux
 
 # Display welcome message on tmux shell startup
-RUN cat >> /root/.bashrc <<'EOF'
-########## Tmux startup script ##########
-GREEN=$'\e[1;32m'
-RESET=$'\e[0m'
+# RUN cat >> /root/.bashrc <<'EOF'
+# ########## Tmux startup script ##########
+# GREEN=$'\e[1;32m'
+# RESET=$'\e[0m'
 
-# Fix tmux font rendering issues
-export LANG=en_US.UTF-8
+# # Fix tmux font rendering issues
+# export LANG=en_US.UTF-8
 
-# Autostart or attach to a tmux session on shell startup, if not already in one
-if [[ -z "$TMUX" ]] && [[ -n "$PS1" ]] && [[ "$(tty)" == "/dev/pts/"* ]]; then
-    tmux attach || tmux
-fi
+# # Autostart or attach to a tmux session on shell startup, if not already in one
+# if [[ -z "$TMUX" ]] && [[ -n "$PS1" ]] && [[ "$(tty)" == "/dev/pts/"* ]]; then
+#     tmux attach || tmux
+# fi
 
-if [[ -n "$TMUX" && $- == *i* ]]; then
-    # Display connection info
-    # echo -e "\n[${GREEN} $(curl -s ipinfo.io/ip) ${RESET}] - $(curl -s ipinfo.io/org)"
-    # echo -e "$(curl -s ipinfo.io/city), $(curl -s ipinfo.io/region), $(curl -s ipinfo.io/country)\n"
+# if [[ -n "$TMUX" && $- == *i* ]]; then
+#     # Display connection info
+#     # echo -e "\n[${GREEN} $(curl -s ipinfo.io/ip) ${RESET}] - $(curl -s ipinfo.io/org)"
+#     # echo -e "$(curl -s ipinfo.io/city), $(curl -s ipinfo.io/region), $(curl -s ipinfo.io/country)\n"
 		
-		tmux ls
-    echo -e "\nHappy hacking!"
-fi
-EOF
+# 		tmux ls
+#     echo -e "\nHappy hacking!"
+# fi
+# EOF
 
 # Simplify the BASH prompt
 RUN sed -i 's/PROMPT_ALTERNATIVE=twoline/PROMPT_ALTERNATIVE=backtrack/g' /root/.bashrc
