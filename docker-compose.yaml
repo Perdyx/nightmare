@@ -28,7 +28,7 @@ services:
     environment:
       - ROOT_PASSWORD=$ROOT_PASSWORD
     tty: true
-    restart: no
+    restart: unless-stopped
 
   ngrok:
     image: ngrok/ngrok:latest
