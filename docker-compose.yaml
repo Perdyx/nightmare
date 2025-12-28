@@ -5,14 +5,14 @@ networks:
     driver: bridge
 
 volumes:
-  n8n_data:
-
+  vscode_data:
+    
 services:
   hexstrike:
     image: hexstrike:latest
     container_name: hexstrike
     build:
-      context: ./kali
+      context: ./hexstrike
       dockerfile: Dockerfile
     cap_add:
       - NET_ADMIN
@@ -28,41 +28,4 @@ services:
     environment:
       - ROOT_PASSWORD=$ROOT_PASSWORD
     tty: true
-    restart: unless-stopped
-
-  ngrok:
-    image: ngrok/ngrok:latest
-    container_name: ngrok 
-    ports:
-      - "4040:4040"
-    networks:
-      - nightmare_network
-    environment:
-      - NGROK_AUTHTOKEN=${NGROK_TOKEN}
-    command: http --url=${NGROK_SUBDOMAIN}.${NGROK_DOMAIN} n8n:5678
-    restart: unless-stopped
-
-  n8n:
-    image: docker.n8n.io/n8nio/n8n
-    container_name: n8n
-    depends_on:
-      - hexstrike
-      - ngrok
-    ports:
-      - "127.0.0.1:5678:5678"
-    networks:
-      - nightmare_network
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - n8n_data:/home/node/.n8n
-    environment:
-      - NODE_ENV=production
-      - GENERIC_TIMEZONE=${TIMEZONE}
-      - TZ=${TIMEZONE}
-      - N8N_SECURE_COOKIE=false
-      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
-      - N8N_RUNNERS_ENABLED=true
-      - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
-      - WEBHOOK_URL=https://${NGROK_SUBDOMAIN}.${NGROK_DOMAIN}
-      - N8N_EDITOR_BASE_URL=http://localhost:5678
     restart: unless-stopped
