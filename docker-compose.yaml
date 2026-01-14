@@ -1,31 +1,32 @@
 name: nightmare
 
 networks:
-  nightmare_network:
+  nightmare:
     driver: bridge
 
-volumes:
-  vscode_data:
-    
 services:
-  hexstrike:
-    image: hexstrike:latest
-    container_name: hexstrike
+  nightmare:
+    image: nightmare:latest
+    container_name: nightmare
     build:
-      context: ./hexstrike
+      context: ./core
       dockerfile: Dockerfile
     cap_add:
       - NET_ADMIN
       - NET_RAW
-    ports:
-      - "$SSH_PORT:22"
-      - "8000:8000"
-      - "8888:8888"
     networks:
-      - nightmare_network
+      - nightmare
+    ports:
+      - "2222:22"
+      - "8888:8888"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
-      - $WORKSPACE:/root/workspace:z
+      - ./workspace:/workspace:rw
+      - ./core/settings.json:/.vscode/settings.json:ro
+      - ./core/mcp.json:/.vscode/mcp.json:ro
     environment:
+      - TZ=$TIMEZONE
       - ROOT_PASSWORD=$ROOT_PASSWORD
     tty: true
     restart: unless-stopped

@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "Hexstrike": {
+      "type": "stdio",
+      "command": "hexstrike_mcp",
+      "args": [
+        "--server",
+        "http://localhost:8888"
+      ]
+    }
+  },
+  "inputs": []
+}
